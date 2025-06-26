@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Create New Event</h2>
+    <form method="POST" action="{{ url_for('create_event') }}">
+        <div class="mb-3">
+            <label for="title" class="form-label">Event Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="realm" class="form-label">Realm</label>
+            <select class="form-select" id="realm" name="realm" required>
+                <option value="Everstars">Everstars</option>
+                <option value="Guildhall">Guildhall</option>
+                <option value="Tyrs">Tyrs</option>
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label for="timeblocks" class="form-label">Number of Timeblocks</label>
+            <input type="number" class="form-control" id="timeblocks" name="timeblocks" min="1" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="start_date" class="form-label">Start Date and Time</label>
+            <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="end_date" class="form-label">End Date and Time</label>
+            <input type="datetime-local" class="form-control" id="end_date" name="end_date" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" class="form-control" id="location" name="location" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Create Event</button>
+    </form>
+</div>
+{% endblock %}

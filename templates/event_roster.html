@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Event Roster: {{ event.title }}</h2>
+        {% if current_user.can_create_events %}
+        <a href="{{ url_for('event_roster_pdf', event_id=event.id) }}" class="btn btn-danger" target="_blank">
+            <i class="fas fa-file-pdf"></i> Print PDF
+        </a>
+        {% endif %}
+    </div>
+    <p><strong>Realm:</strong> {{ event.realm }}<br>
+       <strong>Location:</strong> {{ event.location }}<br>
+       <strong>Start:</strong> {{ event.start_date.strftime('%Y-%m-%d %I:%M %p') }}<br>
+       <strong>End:</strong> {{ event.end_date.strftime('%Y-%m-%d %I:%M %p') }}</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">Participants</div>
+                <div class="card-body">
+                    {% if participant_groups %}
+                    <table class="table table-sm">
+                        <thead><tr><th>User</th><th>Character</th><th>Timeblocks</th></tr></thead>
+                        <tbody>
+                        {% for group in participant_groups %}
+                        <tr>
+                            <td>{{ group.user.username }} ({{ group.user.email }})</td>
+                            <td>{{ group.character.name }} ({{ group.character.realm }})</td>
+                            <td>{{ group.timeblocks|join(', ') }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted">No participants.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">Cast</div>
+                <div class="card-body">
+                    {% if cast_groups %}
+                    <table class="table table-sm">
+                        <thead><tr><th>User</th><th>Character</th><th>Timeblocks</th><th>Status</th></tr></thead>
+                        <tbody>
+                        {% for group in cast_groups %}
+                        <tr>
+                            <td>{{ group.user.username }} ({{ group.user.email }})</td>
+                            <td>{{ group.character.name }} ({{ group.character.realm }})</td>
+                            <td>{{ group.timeblocks|join(', ') }}</td>
+                            <td>{{ group.statuses|join(', ') }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted">No cast signups.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="{{ url_for('events') }}" class="btn btn-secondary">Back to Events</a>
+</div>
+{% endblock %} 

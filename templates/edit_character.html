@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Character{% endblock %}
+
+{% block content %}
+<div class="row">
+    <form method="POST" id="characterForm">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Character Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ character.name }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Realm</label>
+                        <input type="text" class="form-control" value="{{ character.realm }}" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="species" class="form-label">Species</label>
+                        <select class="form-select" id="species" name="species" required>
+                            {% for specie in species_by_realm[character.realm] %}
+                            <option value="{{ specie }}" {% if specie == character.species %}selected{% endif %}>{{ specie }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="group" class="form-label">Group</label>
+                        <input type="text" class="form-control" id="group" name="group" value="{{ character.group_name }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="health" class="form-label">Health (200 status each, max 10)</label>
+                        <input type="number" class="form-control" id="health" name="health" min="0" max="10" value="{{ character.health }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="stamina" class="form-label">Stamina</label>
+                        <input type="number" class="form-control" id="stamina" name="stamina" min="0" max="25" value="{{ character.stamina }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Status Information</label>
+                        <div class="list-group">
+                            <div class="list-group-item">Total Status: {{ character.total_status }}</div>
+                            <div class="list-group-item">Status Spent: {{ character.status_spent }}</div>
+                            <div class="list-group-item">Status Remaining: {{ character.status_remaining }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Skills</h3>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="skillsAccordion">
+                        {% for category in skills_by_category %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}">
+                                    {{ category }}
+                                </button>
+                            </h2>
+                            <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" data-bs-parent="#skillsAccordion">
+                                <div class="accordion-body">
+                                    <div class="accordion" id="subcategoryAccordion{{ loop.index }}">
+                                        {% for subcategory, skills in skills_by_subcategory[category].items() %}
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                                        data-bs-target="#subcollapse{{ loop.index }}_{{ loop.index0 }}">
+                                                    {{ subcategory }}
+                                                </button>
+                                            </h2>
+                                            <div id="subcollapse{{ loop.index }}_{{ loop.index0 }}" 
+                                                 class="accordion-collapse collapse" 
+                                                 data-bs-parent="#subcategoryAccordion{{ loop.index }}">
+                                                <div class="accordion-body">
+                                                    <div class="list-group">
+                                                        {% for skill in skills %}
+                                                        <div class="list-group-item">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" name="skills" value="{{ skill.id }}"
+                                                                       id="skill{{ skill.id }}" {% if skill.id in character_skills %}checked{% endif %}>
+                                                                <label class="form-check-label" for="skill{{ skill.id }}">
+                                                                    {{ skill.name }} ({{ skill.cost }} status)
+                                                                    {% if skill.rank %}
+                                                                    <span class="badge bg-secondary">Rank {{ skill.rank }}</span>
+                                                                    {% endif %}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-12 mt-4">
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="{{ url_for('my_characters') }}" class="btn btn-outline-secondary">Back to Characters</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const healthInput = document.getElementById('health');
+    const staminaInput = document.getElementById('stamina');
+    const skillCheckboxes = document.querySelectorAll('input[name="skills"]');
+    
+    function updateStatus() {
+        let totalSpent = 0;
+        
+        // Calculate health cost
+        totalSpent += healthInput.value * 200;
+        
+        // Calculate stamina cost
+        const stamina = parseInt(staminaInput.value);
+        if (stamina > 0) {
+            if (stamina <= 5) {
+                totalSpent += stamina * 100;
+            } else if (stamina <= 10) {
+                totalSpent += 500 + (stamina - 5) * 200;
+            } else if (stamina <= 15) {
+                totalSpent += 1500 + (stamina - 10) * 300;
+            } else if (stamina <= 20) {
+                totalSpent += 3000 + (stamina - 15) * 400;
+            } else {
+                totalSpent += 5000 + (stamina - 20) * 500;
+            }
+        }
+        
+        // Calculate skill costs
+        skillCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                const costText = checkbox.parentElement.querySelector('.form-check-label').textContent;
+                const costMatch = costText.match(/\((\d+) status\)/);
+                if (costMatch) {
+                    const cost = parseInt(costMatch[1]);
+                    totalSpent += cost;
+                }
+            }
+        });
+        
+        // Update status information
+        const totalStatus = parseInt('{{ character.total_status }}');
+        const statusSpent = totalSpent;
+        const statusRemaining = totalStatus - statusSpent;
+        
+        document.querySelector('.list-group-item:nth-child(2)').textContent = `Status Spent: ${statusSpent}`;
+        document.querySelector('.list-group-item:nth-child(3)').textContent = `Status Remaining: ${statusRemaining}`;
+    }
+    
+    healthInput.addEventListener('change', updateStatus);
+    staminaInput.addEventListener('change', updateStatus);
+    skillCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateStatus);
+    });
+});
+</script>
+{% endblock %} 

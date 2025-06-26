@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <h1 class="display-4">Welcome to Mystic Realms</h1>
+    <p class="lead">Your journey into the mystical realms begins here.</p>
+    
+    {% if not current_user.is_authenticated %}
+    <div class="mt-4">
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg me-3">Register</a>
+        <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg">Login</a>
+    </div>
+    {% else %}
+    <div class="mt-4">
+        <a href="{{ url_for('my_characters') }}" class="btn btn-primary btn-lg">View My Characters</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

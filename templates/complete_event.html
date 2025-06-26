@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Complete Event</h1>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">{{ event.title }}</h5>
+            <p class="card-text">
+                <strong>Realm:</strong> {{ event.realm }}<br>
+                <strong>Location:</strong> {{ event.location }}<br>
+                <strong>Start Date:</strong> {{ event.start_date.strftime('%Y-%m-%d %H:%M') }}<br>
+                <strong>End Date:</strong> {{ event.end_date.strftime('%Y-%m-%d %H:%M') }}
+            </p>
+        </div>
+    </div>
+    
+    <form method="POST" class="mt-4">
+        {% for participation in participations %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Timeblock {{ participation.timeblock }} - {{ participation.character.name }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="service_{{ participation.id }}" name="service_{{ participation.id }}" value="yes">
+                            <label class="form-check-label" for="service_{{ participation.id }}">
+                                Performed Service (+25 status)
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="decorated_{{ participation.id }}" name="decorated_{{ participation.id }}" value="yes">
+                            <label class="form-check-label" for="decorated_{{ participation.id }}">
+                                Decorated Area (+25 status)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="resources_{{ participation.id }}">Resources Used (max 25, +1 status each)</label>
+                            <input type="number" class="form-control" id="resources_{{ participation.id }}" name="resources_{{ participation.id }}" min="0" max="25" value="0">
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="treasure_{{ participation.id }}">Treasure Turned In (max 25, +1 status each)</label>
+                            <input type="number" class="form-control" id="treasure_{{ participation.id }}" name="treasure_{{ participation.id }}" min="0" max="25" value="0">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>Base Status:</strong> 100<br>
+                    <strong>Maximum Additional Status:</strong> 100 (25 service + 25 decoration + 25 resources + 25 treasure)<br>
+                    <strong>Total Possible Status:</strong> 200
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Complete Event</button>
+            <a href="{{ url_for('events') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add validation for resource and treasure inputs
+    const inputs = document.querySelectorAll('input[type="number"]');
+    inputs.forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.value < 0) this.value = 0;
+            if (this.value > 25) this.value = 25;
+        });
+    });
+});
+</script>
+{% endblock %} 

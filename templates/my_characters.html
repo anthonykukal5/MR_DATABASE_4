@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}My Characters{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Characters</h2>
+        <a href="{{ url_for('create_character') }}" class="btn btn-primary">Create New Character</a>
+    </div>
+
+    {% if characters %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for character in characters %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ character.name }}</h5>
+                    <p class="card-text">
+                        <strong>Realm:</strong> {{ character.realm }}<br>
+                        <strong>Species:</strong> {{ character.species }}<br>
+                        <strong>Status:</strong> {{ character.status_spent }}/{{ character.total_status }}
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('view_character', character_id=character.id) }}" class="btn btn-primary">View</a>
+                        <a href="{{ url_for('edit_character', character_id=character.id) }}" class="btn btn-secondary">Edit</a>
+                        <a href="{{ url_for('character_status_history', character_id=character.id) }}" class="btn btn-info">History</a>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ character.id }}">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteModal{{ character.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ character.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel{{ character.id }}">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete <strong>{{ character.name }}</strong>? This action cannot be undone.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form action="{{ url_for('delete_character', character_id=character.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger">Delete Character</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        You haven't created any characters yet. <a href="{{ url_for('create_character') }}">Create your first character</a>!
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

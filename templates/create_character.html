@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Create Character{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="text-center">Create New Character</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="characterForm">
+                    <div class="mb-3">
+                        <label for="realm" class="form-label">Realm</label>
+                        <select class="form-select" id="realm" name="realm" required onchange="updateSpecies()">
+                            <option value="">Choose a realm...</option>
+                            <option value="Everstars">Everstars</option>
+                            <option value="Guildhall">Guildhall</option>
+                            <option value="Tyrs">Tyrs</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Character Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="species" class="form-label">Species</label>
+                        <select class="form-select" id="species" name="species" required>
+                            <option value="">Choose a species...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Create Character</button>
+                        <a href="{{ url_for('my_characters') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const speciesByRealm = {
+    'Everstars': ['Human', 'Android', 'Gen-E'],
+    'Guildhall': ['Human', 'Elf', 'Orc'],
+    'Tyrs': ['Human', 'Ghoul', 'Airadin']
+};
+
+function updateSpecies() {
+    const realmSelect = document.getElementById('realm');
+    const speciesSelect = document.getElementById('species');
+    const selectedRealm = realmSelect.value;
+    
+    // Clear current options
+    speciesSelect.innerHTML = '<option value="">Choose a species...</option>';
+    
+    if (selectedRealm) {
+        const species = speciesByRealm[selectedRealm];
+        species.forEach(specie => {
+            const option = document.createElement('option');
+            option.value = specie;
+            option.textContent = specie;
+            speciesSelect.appendChild(option);
+        });
+    }
+}
+</script>
+{% endblock %} 

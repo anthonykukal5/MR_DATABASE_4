@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Status Management</h2>
+
+    <!-- Event Status Management Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Select Event for Status Adjustment</h3>
+        </div>
+        <div class="card-body">
+            {% if unprocessed_events %}
+            <div class="list-group">
+                {% for event in unprocessed_events %}
+                <a href="{{ url_for('get_event_participants', event_id=event.id) }}" class="list-group-item list-group-item-action">
+                    {{ event.title }} - {{ event.start_date.strftime('%Y-%m-%d') }}
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">No events need status adjustment.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Cast Management Section -->
+    {% if current_user.can_accept_cast %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Manage Cast Signups</h3>
+        </div>
+        <div class="card-body">
+            {% if cast_events %}
+            <div class="list-group">
+                {% for event in cast_events %}
+                <a href="{{ url_for('get_cast_signups', event_id=event.id) }}" class="list-group-item list-group-item-action">
+                    {{ event.title }} - {{ event.start_date.strftime('%Y-%m-%d') }}
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">No events have pending cast signups.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Manual Status Adjustment Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Manual Status Adjustment</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('adjust_character_status') }}">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="character_search" class="form-label">Search Character</label>
+                            <input type="text" class="form-control" id="character_search" name="character_search" required value="{{ character_search if character_search is defined else '' }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="status_type" class="form-label">Status Type</label>
+                            <select class="form-control" id="status_type" name="status_type" required>
+                                <option value="">Select status type...</option>
+                                <option value="Writing" {% if status_type == 'Writing' %}selected{% endif %}>Writing</option>
+                                <option value="Management" {% if status_type == 'Management' %}selected{% endif %}>Management</option>
+                                <option value="Service" {% if status_type == 'Service' %}selected{% endif %}>Service</option>
+                                <option value="Cast" {% if status_type == 'Cast' %}selected{% endif %}>Cast</option>
+                                <option value="Interaction" {% if status_type == 'Interaction' %}selected{% endif %}>Interaction</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="status_amount" class="form-label">Status Amount</label>
+                            <input type="number" class="form-control" id="status_amount" name="status_amount" required value="{{ status_amount if status_amount is defined else '' }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <input type="text" class="form-control" id="notes" name="notes" value="{{ notes if notes is defined else '' }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <button type="submit" name="action" value="search" class="btn btn-primary">Search Character</button>
+                </div>
+                
+                {% if search_results %}
+                <div class="mb-3">
+                    <label class="form-label">Select Character</label>
+                    <div class="list-group">
+                        {% for character in search_results %}
+                        <div class="list-group-item">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="character_id" id="character_{{ character.id }}" value="{{ character.id }}" required>
+                                <label class="form-check-label" for="character_{{ character.id }}">
+                                    <strong>{{ character.name }}</strong> (ID: {{ character.id }})<br>
+                                    <span>Realm: {{ character.realm }}</span><br>
+                                    <span>User: {{ character.user.last_name }}, {{ character.user.first_name }} ({{ character.user.email }})</span>
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <button type="submit" name="action" value="adjust" class="btn btn-success">Adjust Status</button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Status Purchase Section -->
+    <div class="card mb-5">
+        <div class="card-header">
+            <h4 class="card-title mb-0">Purchase Status</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Status Package</h5>
+                            <p class="card-text">
+                                <strong>Price:</strong> $10.00<br>
+                                <strong>Amount:</strong> 100 Status Points
+                            </p>
+                            <form method="POST" action="{{ url_for('purchase_status') }}">
+                                <div class="mb-3">
+                                    <label for="character_id" class="form-label">Select Character</label>
+                                    <select class="form-select" id="character_id" name="character_id" required>
+                                        <option value="">Choose a character...</option>
+                                        {% for character in user_characters %}
+                                        <option value="{{ character.id }}">{{ character.name }} ({{ character.realm }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-success">Purchase Status</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Status Purchase History</h5>
+                            {% if purchase_history %}
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Character</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for purchase in purchase_history %}
+                                        <tr>
+                                            <td>{{ purchase.date.strftime('%Y-%m-%d') }}</td>
+                                            <td>{{ purchase.character.name }}</td>
+                                            <td>100</td>
+                                            <td>{{ purchase.status }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No purchase history available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Sign up for {{ event.title }}</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Event Details</h5>
+            <ul class="list-unstyled">
+                <li><strong>Realm:</strong> {{ event.realm }}</li>
+                <li><strong>Location:</strong> {{ event.location }}</li>
+                <li><strong>Start Date:</strong> {{ event.start_date.strftime('%Y-%m-%d %H:%M') }}</li>
+                <li><strong>End Date:</strong> {{ event.end_date.strftime('%Y-%m-%d %H:%M') }}</li>
+                <li><strong>Timeblocks:</strong> {{ event.timeblocks }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Participant Signup -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Sign up as Participant</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="signup_type" value="participant">
+                        {% for timeblock in range(1, event.timeblocks + 1) %}
+                        <div class="mb-3">
+                            <label class="form-label">Timeblock {{ timeblock }}</label>
+                            <select name="character_{{ timeblock }}" class="form-select">
+                                <option value="">Select a character</option>
+                                {% for character in realm_characters %}
+                                <option value="{{ character.id }}">{{ character.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">Sign up as Participant</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cast Signup -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Sign up as Cast</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="signup_type" value="cast">
+                        <div class="mb-3">
+                            <label class="form-label">Select Character</label>
+                            <select name="cast_character" class="form-select" required>
+                                <option value="">Select a character</option>
+                                {% for character in all_characters %}
+                                <option value="{{ character.id }}">{{ character.name }} ({{ character.realm }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Select Timeblocks</label>
+                            <div class="row">
+                                {% for timeblock in range(1, event.timeblocks + 1) %}
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="cast_timeblocks" value="{{ timeblock }}" id="timeblock_{{ timeblock }}">
+                                        <label class="form-check-label" for="timeblock_{{ timeblock }}">
+                                            Timeblock {{ timeblock }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Sign up as Cast</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

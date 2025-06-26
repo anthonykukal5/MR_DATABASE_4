@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Status History for {{ character.name }}</h2>
+        <a href="{{ url_for('view_character', character_id=character.id) }}" class="btn btn-secondary">Back to Character</a>
+    </div>
+
+    <!-- Status Totals -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="card-title mb-0">Status Totals by Type</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for status_type, amount in status_totals.items() %}
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ status_type }}</h5>
+                            <p class="card-text h3">{{ amount }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Status History -->
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title mb-0">Status History</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Type</th>
+                            <th>Event Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in status_history %}
+                        <tr>
+                            <td>{{ entry.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ entry.amount }}</td>
+                            <td>{{ entry.reason }}</td>
+                            <td>{{ entry.notes }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

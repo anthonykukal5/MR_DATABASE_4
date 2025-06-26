@@ -1,0 +1,11 @@
+Flask==3.0.2
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-WTF==1.2.1
+pandas==2.2.1
+openpyxl==3.1.2
+Werkzeug==3.0.1
+email-validator==2.1.0.post1
+APScheduler==3.11.0
+pdf-lib==1.17.1
+reportlab==4.1.0 

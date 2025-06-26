@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Manage Cast Signups - {{ event.title }}</h2>
+    
+    {% if cast_signups %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Timeblock</th>
+                    <th>User</th>
+                    <th>Character</th>
+                    <th>Character Realm</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for signup in cast_signups %}
+                <tr>
+                    <td>{{ signup.timeblock }}</td>
+                    <td>{{ signup.user.last_name }}, {{ signup.user.first_name }}</td>
+                    <td>{{ signup.character.name }}</td>
+                    <td>{{ signup.character.realm }}</td>
+                    <td>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#processModal{{ signup.id }}">
+                            Process
+                        </button>
+                    </td>
+                </tr>
+                
+                <!-- Modal for processing signup -->
+                <div class="modal fade" id="processModal{{ signup.id }}" tabindex="-1" aria-labelledby="processModalLabel{{ signup.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="processModalLabel{{ signup.id }}">Process Cast Signup</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form method="POST" action="{{ url_for('process_cast_signup') }}">
+                                <div class="modal-body">
+                                    <input type="hidden" name="cast_signup_id" value="{{ signup.id }}">
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Status Awards</label>
+                                        <div class="input-group mb-2">
+                                            <span class="input-group-text">Writing Status</span>
+                                            <input type="number" class="form-control" name="writing_status" value="0" min="0">
+                                        </div>
+                                        <div class="input-group mb-2">
+                                            <span class="input-group-text">Management Status</span>
+                                            <input type="number" class="form-control" name="management_status" value="0" min="0">
+                                        </div>
+                                        <small class="text-muted">Note: 100 Cast status will be automatically awarded if accepted.</small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="notes{{ signup.id }}" class="form-label">Notes</label>
+                                        <textarea class="form-control" id="notes{{ signup.id }}" name="notes" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" name="action" value="deny" class="btn btn-danger">Deny</button>
+                                    <button type="submit" name="action" value="accept" class="btn btn-success">Accept</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        No pending cast signups for this event.
+    </div>
+    {% endif %}
+    
+    <a href="{{ url_for('status_management') }}" class="btn btn-secondary">Back to Status Management</a>
+</div>
+{% endblock %} 

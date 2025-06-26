@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>User Permissions Management</h2>
+    
+    <!-- Search Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <label for="name_search" class="form-label">Search Name</label>
+                    <input type="text" class="form-control" id="name_search" name="name_search" value="{{ request.args.get('name_search', '') }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="permission_filter" class="form-label">Filter by Permission</label>
+                    <select class="form-control" id="permission_filter" name="permission_filter">
+                        <option value="">All Permissions</option>
+                        <option value="is_admin" {% if request.args.get('permission_filter') == 'is_admin' %}selected{% endif %}>Admin</option>
+                        <option value="is_moderator" {% if request.args.get('permission_filter') == 'is_moderator' %}selected{% endif %}>Moderator</option>
+                        <option value="can_create_events" {% if request.args.get('permission_filter') == 'can_create_events' %}selected{% endif %}>Create Events</option>
+                        <option value="can_add_event_status" {% if request.args.get('permission_filter') == 'can_add_event_status' %}selected{% endif %}>Add Event Status</option>
+                        <option value="can_adjust_character_status" {% if request.args.get('permission_filter') == 'can_adjust_character_status' %}selected{% endif %}>Adjust Character Status</option>
+                        <option value="can_accept_cast" {% if request.args.get('permission_filter') == 'can_accept_cast' %}selected{% endif %}>Accept Cast</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Users Table -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Admin</th>
+                    <th>Moderator</th>
+                    <th>Create Events</th>
+                    <th>Add Event Status</th>
+                    <th>Adjust Character Status</th>
+                    <th>Accept Cast</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.last_name }}, {{ user.first_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input permission-toggle" type="checkbox" 
+                                   data-user-id="{{ user.id }}" 
+                                   data-permission="is_admin"
+                                   {% if user.is_admin %}checked{% endif %}
+                                   {% if not is_admin %}disabled{% endif %}>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input permission-toggle" type="checkbox" 
+                                   data-user-id="{{ user.id }}" 
+                                   data-permission="is_moderator"
+                                   {% if user.is_moderator %}checked{% endif %}
+                                   {% if not is_admin %}disabled{% endif %}>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input permission-toggle" type="checkbox" 
+                                   data-user-id="{{ user.id }}" 
+                                   data-permission="can_create_events"
+                                   {% if user.can_create_events %}checked{% endif %}
+                                   {% if not is_admin and not current_user.is_moderator %}disabled{% endif %}>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input permission-toggle" type="checkbox" 
+                                   data-user-id="{{ user.id }}" 
+                                   data-permission="can_add_event_status"
+                                   {% if user.can_add_event_status %}checked{% endif %}
+                                   {% if not is_admin and not current_user.is_moderator %}disabled{% endif %}>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input permission-toggle" type="checkbox" 
+                                   data-user-id="{{ user.id }}" 
+                                   data-permission="can_adjust_character_status"
+                                   {% if user.can_adjust_character_status %}checked{% endif %}
+                                   {% if not is_admin and not current_user.is_moderator %}disabled{% endif %}>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input permission-toggle" type="checkbox" 
+                                   data-user-id="{{ user.id }}" 
+                                   data-permission="can_accept_cast"
+                                   {% if user.can_accept_cast %}checked{% endif %}
+                                   {% if not is_admin and not current_user.is_moderator %}disabled{% endif %}>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('view_user_details', user_id=user.id) }}" class="btn btn-sm btn-info">View Details</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const permissionToggles = document.querySelectorAll('.permission-toggle');
+    
+    permissionToggles.forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            const userId = this.dataset.userId;
+            const permission = this.dataset.permission;
+            const value = this.checked;
+            
+            fetch(`/admin/user/${userId}/update_permission`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `permission=${permission}&value=${value}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const toast = document.createElement('div');
+                    toast.className = 'toast show position-fixed bottom-0 end-0 m-3';
+                    toast.setAttribute('role', 'alert');
+                    toast.innerHTML = `
+                        <div class="toast-header">
+                            <strong class="me-auto">Success</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                        </div>
+                        <div class="toast-body">
+                            Permission updated successfully
+                        </div>
+                    `;
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 3000);
+                } else {
+                    // Show error message
+                    alert('Error updating permission: ' + data.message);
+                    // Revert the toggle
+                    this.checked = !value;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating permission');
+                // Revert the toggle
+                this.checked = !value;
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 
