@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Subscribe to Membership{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">Choose Your Membership</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card h-100">
+                                    <div class="card-header text-center">
+                                        <h4>Basic</h4>
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">$0/year</h5>
+                                        <ul class="list-unstyled">
+                                            <li>✓ Create up to 10 characters</li>
+                                            <li>✓ Edit oldest 10 characters</li>
+                                        </ul>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="membership_level" id="basic" value="Basic" required>
+                                            <label class="form-check-label" for="basic">
+                                                Choose Basic
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card h-100 border-primary">
+                                    <div class="card-header text-center bg-primary text-white">
+                                        <h4>Standard</h4>
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">$0/year</h5>
+                                        <ul class="list-unstyled">
+                                            <li>✓ Create up to 25 characters</li>
+                                            <li>✓ Edit oldest 25 characters</li>
+                                        </ul>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="membership_level" id="standard" value="Standard" required>
+                                            <label class="form-check-label" for="standard">
+                                                Choose Standard
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card h-100 border-success">
+                                    <div class="card-header text-center bg-success text-white">
+                                        <h4>Premium</h4>
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">$0/year</h5>
+                                        <ul class="list-unstyled">
+                                            <li>✓ Create up to 50 characters</li>
+                                            <li>✓ Edit oldest 50 characters</li>
+                                        </ul>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="membership_level" id="premium" value="Premium" required>
+                                            <label class="form-check-label" for="premium">
+                                                Choose Premium
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Subscribe Now</button>
+                            <a href="{{ url_for('users.membership') }}" class="btn btn-secondary btn-lg ms-2">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

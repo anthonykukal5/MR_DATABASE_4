@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}Membership{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">Your Membership</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Current Status</h4>
+                            <p><strong>Membership Level:</strong> 
+                                <span class="badge {% if current_user.membership_level == 'Premium' %}bg-success{% elif current_user.membership_level == 'Standard' %}bg-primary{% elif current_user.membership_level == 'Basic' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                    {{ current_user.membership_level }}
+                                </span>
+                                {% if current_user.is_membership_expired() %}
+                                <span class="badge bg-danger">Expired</span>
+                                {% endif %}
+                            </p>
+                            {% if current_user.membership_expiry %}
+                            <p><strong>Expires:</strong> {{ current_user.membership_expiry.strftime('%Y-%m-%d') }}
+                            {% if current_user.is_membership_expired() %}
+                            <span class="text-danger">(Expired)</span>
+                            {% endif %}
+                            </p>
+                            {% endif %}
+                            <p><strong>Character Limit:</strong> {{ current_user.get_character_limit() }}</p>
+                            <p><strong>Characters Created:</strong> {{ current_user.characters|length }}</p>
+                            <p><strong>Can Edit Characters:</strong> {{ 'Yes' if current_user.can_edit_characters() else 'No' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Character Status</h4>
+                            {% set editable_chars = current_user.get_editable_characters() %}
+                            <p><strong>Editable Characters:</strong> {{ editable_chars|length }}
+                            {% if current_user.membership_level != 'None' %}
+                            (oldest)
+                            {% endif %}
+                            </p>
+                            {% if current_user.membership_level == 'None' and current_user.characters|length > 0 %}
+                            <div class="alert alert-warning">
+                                <strong>Note:</strong> You cannot edit any characters with your current membership level. Upgrade your membership to edit characters.
+                            </div>
+                            {% elif current_user.characters|length > current_user.get_character_limit() %}
+                            <div class="alert alert-warning">
+                                <strong>Note:</strong> You have {{ current_user.characters|length - current_user.get_character_limit() }} newer character(s) that cannot be edited. Only your {{ current_user.get_character_limit() }} oldest characters can be edited with your {{ current_user.membership_level }} membership.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Membership Levels</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h5>None (Free)</h5>
+                        <ul class="list-unstyled">
+                            <li>✓ Create 1 character</li>
+                            <li>✗ Cannot edit characters</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h5>Basic</h5>
+                        <ul class="list-unstyled">
+                            <li>✓ Create up to 10 characters</li>
+                            <li>✓ Edit oldest 10 characters</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h5>Standard</h5>
+                        <ul class="list-unstyled">
+                            <li>✓ Create up to 25 characters</li>
+                            <li>✓ Edit oldest 25 characters</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h5>Premium</h5>
+                        <ul class="list-unstyled">
+                            <li>✓ Create up to 50 characters</li>
+                            <li>✓ Edit oldest 50 characters</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <small>Manage your membership below.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Membership Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Membership Actions</h4>
+                </div>
+                <div class="card-body">
+                    {% if current_user.membership_level == 'None' or current_user.is_membership_expired() %}
+                    <!-- Subscribe to membership -->
+                    <div class="text-center">
+                        <h5>Subscribe to a Membership</h5>
+                        {% if current_user.is_membership_expired() %}
+                        <p class="text-muted">Your membership has expired. Renew to continue editing characters.</p>
+                        {% else %}
+                        <p class="text-muted">Choose a membership level to get started</p>
+                        {% endif %}
+                        <a href="{{ url_for('users.subscribe_membership') }}" class="btn btn-primary">Subscribe Now</a>
+                    </div>
+                    {% else %}
+                    <!-- Manage existing membership -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Upgrade Membership</h5>
+                            {% if current_user.membership_level == 'Basic' %}
+                            <p>Upgrade to Standard or Premium for more character slots</p>
+                            <a href="{{ url_for('users.upgrade_membership') }}" class="btn btn-warning">Upgrade</a>
+                            {% elif current_user.membership_level == 'Standard' %}
+                            <p>Upgrade to Premium for maximum character slots</p>
+                            <a href="{{ url_for('users.upgrade_membership') }}" class="btn btn-warning">Upgrade</a>
+                            {% else %}
+                            <p class="text-muted">You have the highest membership level</p>
+                            <button class="btn btn-secondary" disabled>Already Premium</button>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Cancel Membership</h5>
+                            <p class="text-muted">Cancel your membership (you'll lose editing privileges)</p>
+                            <form method="POST" action="{{ url_for('users.cancel_membership') }}" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel your membership? You will lose the ability to edit characters.')">
+                                <button type="submit" class="btn btn-danger">Cancel Membership</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if current_user.characters %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Your Characters</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Realm</th>
+                                    <th>Species</th>
+                                    <th>Status</th>
+                                    <th>Can Edit</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for character in current_user.characters %}
+                                <tr>
+                                    <td>{{ character.name }}</td>
+                                    <td>{{ character.realm }}</td>
+                                    <td>{{ character.species }}</td>
+                                    <td>{{ character.total_status }}</td>
+                                    <td>
+                                        {% if character in current_user.get_editable_characters() %}
+                                        <span class="badge bg-success">Yes</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">No</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('users.view_character', character_id=character.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                        {% if character in current_user.get_editable_characters() %}
+                                        <a href="{{ url_for('users.edit_character', character_id=character.id) }}" class="btn btn-sm btn-outline-warning">Edit</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

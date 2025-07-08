@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Character{% endblock %}
+{% block title %}Creating Character{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -118,8 +118,8 @@
         
         <div class="col-12 mt-4">
             <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-                <a href="{{ url_for('users.my_characters') }}" class="btn btn-outline-secondary">Back to Characters</a>
+                <button type="submit" class="btn btn-primary">Create Character</button>
+                <a href="{{ url_for('users.my_characters') }}" class="btn btn-outline-secondary">Cancel</a>
             </div>
         </div>
     </form>

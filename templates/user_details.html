@@ -4,7 +4,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>User Details: {{ user.last_name }}, {{ user.first_name }}</h2>
-        <a href="{{ url_for('admin_permissions') }}" class="btn btn-secondary">Back to Permissions</a>
+        <a href="{{ back_url }}" class="btn btn-secondary">Back</a>
     </div>
 
     <div class="row">
@@ -17,9 +17,23 @@
                 <div class="card-body">
                     <p><strong>Name:</strong> {{ user.last_name }}, {{ user.first_name }}</p>
                     <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Membership Level:</strong> 
+                        <span class="badge {% if user.membership_level == 'Premium' %}bg-success{% elif user.membership_level == 'Standard' %}bg-primary{% elif user.membership_level == 'Basic' %}bg-warning{% else %}bg-secondary{% endif %}">
+                            {{ user.membership_level }}
+                        </span>
+                    </p>
+                    {% if user.membership_expiry %}
+                    <p><strong>Membership Expires:</strong> {{ user.membership_expiry.strftime('%Y-%m-%d') }}</p>
+                    {% endif %}
+                    <p><strong>Character Limit:</strong> {{ user.get_character_limit() }}</p>
+                    <p><strong>Can Edit Characters:</strong> {{ 'Yes' if user.can_edit_characters() else 'No' }}</p>
                     <p><strong>Can Create Events:</strong> {{ 'Yes' if user.can_create_events else 'No' }}</p>
                     <p><strong>Can Add Event Status:</strong> {{ 'Yes' if user.can_add_event_status else 'No' }}</p>
                     <p><strong>Can Adjust Character Status:</strong> {{ 'Yes' if user.can_adjust_character_status else 'No' }}</p>
+                    <li class="list-group-item"><strong>Phone:</strong> {{ user.phone|phone_format }}</li>
+                    <li class="list-group-item"><strong>Address:</strong> {{ user.address }}</li>
+                    <li class="list-group-item"><strong>Birthday:</strong> {{ user.birthday.strftime('%Y-%m-%d') if user.birthday else '' }}</li>
+                    <li class="list-group-item"><strong>Date Registered:</strong> {{ user.date_registered.strftime('%Y-%m-%d') if user.date_registered else '' }}</li>
                 </div>
             </div>
         </div>
@@ -61,5 +75,35 @@
             </div>
         </div>
     </div>
+
+    {% if current_user.can_arbitrate and user.complaints_against %}
+    <h4>Accepted Offenses Against This User</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Date Filed</th>
+                <th>Date of Offense</th>
+                <th>Offense</th>
+                <th>Penalty</th>
+                <th>Arbitrator</th>
+                <th>Reason</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in user.complaints_against if c.status == 'Resolved' and c.resolution == 'Accepted' %}
+            <tr>
+                <td>{{ c.date_filed.strftime('%Y-%m-%d') }}</td>
+                <td>{{ c.date_of_offense.strftime('%Y-%m-%d') if c.date_of_offense else '' }}</td>
+                <td>{{ c.offense }}</td>
+                <td>{{ c.penalty }}</td>
+                <td>{% if c.arbitrator %}{{ c.arbitrator.first_name }} {{ c.arbitrator.last_name }}{% else %}-{% endif %}</td>
+                <td>{{ c.resolution_reason }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="text-muted">No accepted offenses found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
 </div>
 {% endblock %} 

@@ -10,53 +10,62 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('home') }}">Mystic Realms</a>
+            <a class="navbar-brand" href="{{ url_for('main_routes.home') }}">Mystic Realms</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                        <a class="nav-link" href="{{ url_for('main_routes.home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('books') }}">Books</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('events') }}">Events</a>
+                        <a class="nav-link" href="{{ url_for('main_routes.books') }}">Books</a>
                     </li>
                     {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('my_characters') }}">My Characters</a>
+                        <a class="nav-link" href="{{ url_for('events.events') }}">Events</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('status_management') }}">Status Management</a>
+                        <a class="nav-link" href="{{ url_for('users.my_characters') }}">Characters</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+                        <a class="nav-link" href="{{ url_for('events.status_management') }}">Status</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('users.membership') }}">Membership</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main_routes.profile') }}">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('arbitration.index') }}">Arbitration</a>
                     </li>
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav">
                     {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <span class="nav-link">Welcome, {{ current_user.last_name }}, {{ current_user.first_name }}</span>
-                    </li>
-                    {% if current_user.is_admin or current_user.is_moderator %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin_permissions') }}">Admin</a>
-                    </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
-                    </li>
+                        <li class="nav-item">
+                            <span class="nav-link">Welcome, {{ current_user.first_name }}</span>
+                        </li>
+                        {% if current_user.is_admin or current_user.is_moderator %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('users.admin_permissions') }}">Admin</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('events.event_history') }}">History</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main_routes.logout') }}">Logout</a>
+                        </li>
                     {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('register') }}">Register</a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main_routes.login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main_routes.register') }}">Register</a>
+                        </li>
                     {% endif %}
                 </ul>
             </div>

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Complaint Details</h2>
+    <table class="table table-bordered">
+        <tr><th>Date Filed</th><td>{{ complaint.date_filed.strftime('%Y-%m-%d') }}</td></tr>
+        <tr><th>Date of Offense</th><td>{{ complaint.date_of_offense.strftime('%Y-%m-%d') if complaint.date_of_offense else '' }}</td></tr>
+        <tr><th>Complainant</th><td>{{ complaint.complainant.first_name }} {{ complaint.complainant.last_name }} <a href="{{ url_for('view_user_details', user_id=complaint.complainant.id) }}" class="btn btn-sm btn-secondary ms-2">View User</a></td></tr>
+        <tr><th>Accused</th><td>{{ complaint.accused.first_name }} {{ complaint.accused.last_name }} <a href="{{ url_for('view_user_details', user_id=complaint.accused.id) }}" class="btn btn-sm btn-secondary ms-2">View User</a></td></tr>
+        <tr><th>Offense</th><td>{{ complaint.offense }}</td></tr>
+        <tr><th>Penalty</th><td>{{ complaint.penalty }}</td></tr>
+        <tr><th>Description</th><td>{{ complaint.description }}</td></tr>
+        <tr><th>Status</th><td>{{ complaint.status }}</td></tr>
+        <tr><th>Arbitrator</th><td>{% if complaint.arbitrator %}{{ complaint.arbitrator.first_name }} {{ complaint.arbitrator.last_name }}{% else %}-{% endif %}</td></tr>
+        {% if complaint.status == 'Resolved' %}
+        <tr><th>Resolution</th><td>{{ complaint.resolution }}</td></tr>
+        <tr><th>Reason</th><td>{{ complaint.resolution_reason }}</td></tr>
+        {% endif %}
+        <tr><th>Resolution Attempt</th><td>{{ complaint.resolution_attempt }}</td></tr>
+        <tr><th>People Involved</th><td>
+            {% if complaint.people_involved %}
+                {% set names = complaint.people_involved.split(',') %}
+                <ul style="margin-bottom: 0; padding-left: 20px;">
+                {% for name in names %}
+                    {% set name = name.strip() %}
+                    <li style="margin-bottom: 8px; padding: 4px 0;">{{ name }}
+                        {% set parts = name.split() %}
+                        {% if parts|length >= 2 %}
+                            {% set first = parts[0] %}
+                            {% set last = ' '.join(parts[1:]) %}
+                            {% for user in users if user.first_name.lower() == first.lower() and user.last_name.lower() == last.lower() %}
+                                <a href="{{ url_for('view_user_details', user_id=user.id) }}" class="btn btn-sm btn-secondary ms-2">View User</a>
+                            {% endfor %}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}-{% endif %}
+        </td></tr>
+    </table>
+    {% if not complaint.arbitrator %}
+    <form method="POST">
+        <button type="submit" name="signup" class="btn btn-primary">Sign Up as Arbitrator</button>
+    </form>
+    {% elif complaint.arbitrator_id == current_user.id and complaint.status != 'Resolved' %}
+    <form method="POST">
+        <div class="mb-3">
+            <label for="resolution_reason" class="form-label">Resolution Reason</label>
+            <textarea class="form-control" id="resolution_reason" name="resolution_reason" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="character_id" class="form-label">Select Character to Deduct Status (for Accept only)</label>
+            <select class="form-select" id="character_id" name="character_id">
+                <option value="">Select character...</option>
+                {% for char in complaint.accused.characters %}
+                <option value="{{ char.id }}">{{ char.name }} ({{ char.realm }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="deduction_amount" class="form-label">Deduction Amount (max: {{ complaint.penalty }})</label>
+            <input type="number" class="form-control" id="deduction_amount" name="deduction_amount" min="1" max="{{ complaint.penalty }}" value="{{ complaint.penalty }}" required>
+        </div>
+        <button type="submit" name="resolve" value="Accepted" class="btn btn-success">Accept Complaint</button>
+        <button type="submit" name="resolve" value="Denied" class="btn btn-danger ms-2">Deny Complaint</button>
+    </form>
+    {% endif %}
+    <a href="{{ url_for('arbitration.index') }}" class="btn btn-secondary mt-3">Back to Arbitration</a>
+</div>
+{% endblock %} 

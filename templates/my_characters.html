@@ -6,7 +6,22 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>My Characters</h2>
-        <a href="{{ url_for('create_character') }}" class="btn btn-primary">Create New Character</a>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('users.membership') }}" class="btn btn-outline-info">Membership</a>
+            <a href="{{ url_for('users.create_character') }}" class="btn btn-primary">Create New Character</a>
+        </div>
+    </div>
+    
+    <!-- Membership Status -->
+    <div class="alert alert-info mb-4">
+        <strong>Membership:</strong> {{ current_user.membership_level }} | 
+        <strong>Character Limit:</strong> {{ current_user.get_character_limit() }} | 
+        <strong>Characters:</strong> {{ characters|length }}/{{ current_user.get_character_limit() }}
+        {% if current_user.can_edit_characters() %}
+        <br><small class="text-info">You can edit your {{ current_user.get_character_limit() }} oldest characters.</small>
+        {% else %}
+        <br><small class="text-warning">You cannot edit characters with your current membership level.</small>
+        {% endif %}
     </div>
 
     {% if characters %}
@@ -22,9 +37,13 @@
                         <strong>Status:</strong> {{ character.status_spent }}/{{ character.total_status }}
                     </p>
                     <div class="d-flex gap-2">
-                        <a href="{{ url_for('view_character', character_id=character.id) }}" class="btn btn-primary">View</a>
-                        <a href="{{ url_for('edit_character', character_id=character.id) }}" class="btn btn-secondary">Edit</a>
-                        <a href="{{ url_for('character_status_history', character_id=character.id) }}" class="btn btn-info">History</a>
+                        <a href="{{ url_for('users.view_character', character_id=character.id) }}" class="btn btn-primary">View</a>
+                        {% if character in current_user.get_editable_characters() %}
+                        <a href="{{ url_for('users.edit_character', character_id=character.id) }}" class="btn btn-secondary">Edit</a>
+                        {% else %}
+                        <button class="btn btn-secondary" disabled title="Cannot edit with current membership level">Edit</button>
+                        {% endif %}
+                        <a href="{{ url_for('users.character_status_history', character_id=character.id) }}" class="btn btn-info">History</a>
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ character.id }}">
                             Delete
                         </button>
@@ -46,7 +65,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <form action="{{ url_for('delete_character', character_id=character.id) }}" method="POST" class="d-inline">
+                        <form action="{{ url_for('users.delete_character', character_id=character.id) }}" method="POST" class="d-inline">
                             <button type="submit" class="btn btn-danger">Delete Character</button>
                         </form>
                     </div>
@@ -57,7 +76,7 @@
     </div>
     {% else %}
     <div class="alert alert-info">
-        You haven't created any characters yet. <a href="{{ url_for('create_character') }}">Create your first character</a>!
+        You haven't created any characters yet. <a href="{{ url_for('users.create_character') }}">Create your first character</a>!
     </div>
     {% endif %}
 </div>

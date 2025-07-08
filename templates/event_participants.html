@@ -4,7 +4,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>{{ event.title }}</h2>
-        <a href="{{ url_for('status_management') }}" class="btn btn-secondary">Back to Events</a>
+        <a href="{{ url_for('events.status_management') }}" class="btn btn-secondary">Back to Events</a>
     </div>
 
     <div class="row">
@@ -15,7 +15,7 @@
                     <h5 class="card-title mb-0">ID: {{ character.id }} - {{ character.name }} ({{ character.realm }})</h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('adjust_event_status') }}">
+                    <form method="POST" action="{{ url_for('events.adjust_event_status') }}">
                         <input type="hidden" name="character_id" value="{{ character.id }}">
                         <input type="hidden" name="event_id" value="{{ event.id }}">
                         

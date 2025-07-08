@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Create New Event</h2>
-    <form method="POST" action="{{ url_for('create_event') }}">
+    <form method="POST" action="{{ url_for('events.create_event') }}">
         <div class="mb-3">
             <label for="title" class="form-label">Event Title</label>
             <input type="text" class="form-control" id="title" name="title" required>

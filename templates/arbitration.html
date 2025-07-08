@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Arbitration</h2>
+    <a href="{{ url_for('arbitration.create_complaint') }}" class="btn btn-primary mb-3">Create Complaint</a>
+    {% if current_user.can_arbitrate or current_user.is_admin or current_user.is_moderator %}
+    <h4>Complaints</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Date Filed</th>
+                <th>Date of Offense</th>
+                <th>Complainant</th>
+                <th>Accused</th>
+                <th>Offense</th>
+                <th>Status</th>
+                <th>Arbitrator</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in complaints %}
+            <tr>
+                <td>{{ c.date_filed.strftime('%Y-%m-%d') }}</td>
+                <td>{{ c.date_of_offense.strftime('%Y-%m-%d') if c.date_of_offense else '' }}</td>
+                <td>{{ c.complainant.first_name }} {{ c.complainant.last_name }}</td>
+                <td>{{ c.accused.first_name }} {{ c.accused.last_name }}</td>
+                <td>{{ c.offense }}</td>
+                <td>{{ c.status }}</td>
+                <td>{% if c.arbitrator %}{{ c.arbitrator.first_name }} {{ c.arbitrator.last_name }}{% else %}-{% endif %}</td>
+                <td><a href="{{ url_for('arbitration.complaint_detail', complaint_id=c.id) }}" class="btn btn-sm btn-info">Details</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-muted">No complaints filed.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+{% endblock %} 

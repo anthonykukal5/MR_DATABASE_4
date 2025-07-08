@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Attended Events</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Realm</th>
+            <th>Title</th>
+            <th>Character</th>
+            <th>Role</th>
+            <th>Timeblocks</th>
+            <th>Status Gained</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in attended %}
+        <tr>
+            <td>{{ entry.event.start_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ entry.event.realm }}</td>
+            <td>{{ entry.event.title }}</td>
+            <td>{{ entry.character.name }}</td>
+            <td>{{ entry.role }}</td>
+            <td>{{ entry.timeblocks|join(', ') }}</td>
+            <td>{{ entry.status_gained }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-muted">No attended events found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('events.events') }}">&larr; Back to Events</a>
+{% endblock %} 

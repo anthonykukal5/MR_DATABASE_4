@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Event History</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th><a href="?sort_by=realm&order={{ 'asc' if sort_by != 'realm' or order == 'desc' else 'desc' }}">Realm{% if sort_by == 'realm' %} {% if order == 'asc' %}↑{% else %}↓{% endif %}{% endif %}</a></th>
+            <th><a href="?sort_by=title&order={{ 'asc' if sort_by != 'title' or order == 'desc' else 'desc' }}">Title{% if sort_by == 'title' %} {% if order == 'asc' %}↑{% else %}↓{% endif %}{% endif %}</a></th>
+            <th><a href="?sort_by=date&order={{ 'asc' if sort_by != 'date' or order == 'desc' else 'desc' }}">Date{% if sort_by == 'date' %} {% if order == 'asc' %}↑{% else %}↓{% endif %}{% endif %}</a></th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for event in events %}
+        <tr>
+            <td>{{ event.realm }}</td>
+            <td>{{ event.title }}</td>
+            <td>{{ event.start_date.strftime('%Y-%m-%d') }}</td>
+            <td>
+                <a href="{{ url_for('events.event_history_detail', event_id=event.id) }}" class="btn btn-sm btn-info">Status</a>
+                <a href="{{ url_for('events.event_roster', event_id=event.id) }}" class="btn btn-sm btn-secondary ms-1">Roster</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %} 

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Event Details: {{ event.title }}</h2>
+<p><strong>Realm:</strong> {{ event.realm }}<br>
+<strong>Date:</strong> {{ event.start_date.strftime('%Y-%m-%d') }}<br>
+<strong>Location:</strong> {{ event.location }}</p>
+
+<h3>Attendees</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user_id, summary in user_summaries.items() %}
+        <tr>
+            <td>{{ summary.user.first_name }} {{ summary.user.last_name }}</td>
+            <td>
+                <a href="{{ url_for('view_user_details', user_id=summary.user.id) }}" class="btn btn-sm btn-primary">View Profile</a>
+                <button class="btn btn-sm btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#eventSummary{{ user_id }}" aria-expanded="false" aria-controls="eventSummary{{ user_id }}">Event Summary</button>
+            </td>
+        </tr>
+        <tr class="collapse" id="eventSummary{{ user_id }}">
+            <td colspan="2">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Character</th>
+                            <th>Status Type</th>
+                            <th>Amount</th>
+                            <th>Reason/Notes</th>
+                            <th>Awarded By</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for char_id, char_summary in summary.characters.items() %}
+                            {% for adj in char_summary.adjustments %}
+                            <tr>
+                                <td>{{ char_summary.character.name }}</td>
+                                <td>{{ adj.status_type }}</td>
+                                <td>{{ adj.amount }}</td>
+                                <td>{{ adj.notes }}</td>
+                                <td>{{ summary.user.first_name }} {{ summary.user.last_name }}</td>
+                                <td>{{ adj.date.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('events.event_history') }}">&larr; Back to Event History</a>
+{% endblock %} 

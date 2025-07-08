@@ -4,9 +4,12 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Events</h2>
-        {% if current_user.can_create_events %}
-        <a href="{{ url_for('create_event') }}" class="btn btn-primary">Create Event</a>
-        {% endif %}
+        <div>
+            {% if current_user.can_create_events %}
+            <a href="{{ url_for('events.create_event') }}" class="btn btn-primary">Create Event</a>
+            {% endif %}
+            <a href="{{ url_for('events.attended_events') }}" class="btn btn-info ms-2">Attended Events</a>
+        </div>
     </div>
 
     <div class="row">
@@ -36,11 +39,11 @@
                                 </div>
                             </div>
                             {% if current_user.can_create_events %}
-                            <a href="{{ url_for('event_roster', event_id=event.id) }}" class="btn btn-sm btn-warning">View Roster</a>
+                            <a href="{{ url_for('events.event_roster', event_id=event.id) }}" class="btn btn-sm btn-warning">View Roster</a>
                             {% endif %}
                             <div class="btn-group" role="group">
-                                <a href="{{ url_for('signup_event', event_id=event.id) }}" class="btn btn-sm btn-success">Sign Up</a>
-                                <a href="{{ url_for('my_event_signups', event_id=event.id) }}" class="btn btn-sm btn-info">View My Signups</a>
+                                <a href="{{ url_for('events.signup_event', event_id=event.id) }}" class="btn btn-sm btn-success">Sign Up</a>
+                                <a href="{{ url_for('events.my_event_signups', event_id=event.id) }}" class="btn btn-sm btn-info">View My Signups</a>
                             </div>
                         </div>
                     </div>
@@ -76,58 +79,13 @@
                                 </div>
                             </div>
                             {% if current_user.can_create_events %}
-                            <a href="{{ url_for('event_roster', event_id=event.id) }}" class="btn btn-sm btn-warning">View Roster</a>
+                            <a href="{{ url_for('events.event_roster', event_id=event.id) }}" class="btn btn-sm btn-warning">View Roster</a>
                             {% endif %}
-                            <a href="{{ url_for('my_event_signups', event_id=event.id) }}" class="btn btn-sm btn-info">View My Signups</a>
+                            <a href="{{ url_for('events.my_event_signups', event_id=event.id) }}" class="btn btn-sm btn-info">View My Signups</a>
                         </div>
                     </div>
                     {% else %}
                     <p class="text-muted">No in-progress events</p>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">Completed Events</h5>
-                    {% if completed_events %}
-                    <form method="POST" action="{{ url_for('clear_completed_events') }}" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to clear all completed events? This action cannot be undone.')">
-                            Clear All
-                        </button>
-                    </form>
-                    {% endif %}
-                </div>
-                <div class="card-body">
-                    {% for event, counts in completed_events %}
-                    <div class="card mb-2">
-                        <div class="card-body">
-                            <h6 class="card-title">{{ event.title }}</h6>
-                            <p class="card-text">
-                                <small>Realm: {{ event.realm }}</small><br>
-                                <small>Location: {{ event.location }}</small><br>
-                                <small>Timeblocks: {{ event.timeblocks }}</small><br>
-                                <small>Start: {{ event.start_date.strftime('%Y-%m-%d %I:%M %p') if event.start_date else '' }}</small><br>
-                                <small>End: {{ event.end_date.strftime('%Y-%m-%d %I:%M %p') if event.end_date else '' }}</small>
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div class="badge bg-primary">
-                                    <i class="fas fa-users"></i> {{ counts.participant_count }} Participants
-                                </div>
-                                <div class="badge bg-secondary">
-                                    <i class="fas fa-theater-masks"></i> {{ counts.cast_count }} Cast
-                                </div>
-                            </div>
-                            {% if current_user.can_create_events %}
-                            <a href="{{ url_for('event_roster', event_id=event.id) }}" class="btn btn-sm btn-warning">View Roster</a>
-                            {% endif %}
-                            <a href="{{ url_for('my_event_signups', event_id=event.id) }}" class="btn btn-sm btn-info">View My Signups</a>
-                        </div>
-                    </div>
-                    {% else %}
-                    <p class="text-muted">No completed events</p>
                     {% endfor %}
                 </div>
             </div>

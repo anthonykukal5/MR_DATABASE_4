@@ -22,6 +22,7 @@
                         <option value="can_add_event_status" {% if request.args.get('permission_filter') == 'can_add_event_status' %}selected{% endif %}>Add Event Status</option>
                         <option value="can_adjust_character_status" {% if request.args.get('permission_filter') == 'can_adjust_character_status' %}selected{% endif %}>Adjust Character Status</option>
                         <option value="can_accept_cast" {% if request.args.get('permission_filter') == 'can_accept_cast' %}selected{% endif %}>Accept Cast</option>
+                        <option value="can_arbitrate" {% if request.args.get('permission_filter') == 'can_arbitrate' %}selected{% endif %}>Arbitrator</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -32,6 +33,27 @@
         </div>
     </div>
     
+    <!-- Print Form -->
+    {% if is_admin or current_user.is_moderator %}
+    <form method="GET" action="{{ url_for('print_users_pdf') }}" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label for="print_permission" class="form-label">Print Users With Permission</label>
+            <select class="form-control" id="print_permission" name="permission">
+                <option value="">All Users</option>
+                <option value="is_admin">Admin</option>
+                <option value="is_moderator">Moderator</option>
+                <option value="can_create_events">Create Events</option>
+                <option value="can_add_event_status">Add Event Status</option>
+                <option value="can_adjust_character_status">Adjust Character Status</option>
+                <option value="can_accept_cast">Accept Cast</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-secondary">Print</button>
+        </div>
+    </form>
+    {% endif %}
+    
     <!-- Users Table -->
     <div class="table-responsive">
         <table class="table table-striped">
@@ -39,12 +61,14 @@
                 <tr>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Membership</th>
                     <th>Admin</th>
                     <th>Moderator</th>
                     <th>Create Events</th>
                     <th>Add Event Status</th>
                     <th>Adjust Character Status</th>
                     <th>Accept Cast</th>
+                    <th>Arbitrator</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -53,6 +77,14 @@
                 <tr>
                     <td>{{ user.last_name }}, {{ user.first_name }}</td>
                     <td>{{ user.email }}</td>
+                    <td>
+                        <span class="badge {% if user.membership_level == 'Premium' %}bg-success{% elif user.membership_level == 'Standard' %}bg-primary{% elif user.membership_level == 'Basic' %}bg-warning{% else %}bg-secondary{% endif %}">
+                            {{ user.membership_level }}
+                        </span>
+                        {% if is_admin %}
+                        <br><a href="{{ url_for('users.admin_manage_membership', user_id=user.id) }}" class="btn btn-sm btn-outline-primary mt-1">Manage</a>
+                        {% endif %}
+                    </td>
                     <td>
                         <div class="form-check form-switch">
                             <input class="form-check-input permission-toggle" type="checkbox" 
@@ -104,6 +136,15 @@
                                    data-user-id="{{ user.id }}" 
                                    data-permission="can_accept_cast"
                                    {% if user.can_accept_cast %}checked{% endif %}
+                                   {% if not is_admin and not current_user.is_moderator %}disabled{% endif %}>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input permission-toggle" type="checkbox" 
+                                   data-user-id="{{ user.id }}" 
+                                   data-permission="can_arbitrate"
+                                   {% if user.can_arbitrate %}checked{% endif %}
                                    {% if not is_admin and not current_user.is_moderator %}disabled{% endif %}>
                         </div>
                     </td>

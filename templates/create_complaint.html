@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>File a Complaint</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Complainant</label>
+            <input type="text" class="form-control" value="{{ current_user.first_name }} {{ current_user.last_name }}" readonly>
+        </div>
+        <div class="mb-3">
+            <label for="accused_name" class="form-label">Accused (type name)</label>
+            <input type="text" class="form-control" id="accused_name" name="accused_name" placeholder="First Last" required autocomplete="off">
+        </div>
+        <div class="mb-3">
+            <label for="offense" class="form-label">Offense</label>
+            <select class="form-select" id="offense" name="offense" required>
+                <option value="">Select offense...</option>
+                {% for o in offenses %}
+                <option value="{{ o.offense }}">{{ o.offense }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="date_of_offense" class="form-label">Date of Offense</label>
+            <input type="date" class="form-control" id="date_of_offense" name="date_of_offense" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="resolution_attempt" class="form-label">Did you attempt to resolve the issue with the person? If so, what was the result of your discussion with the other party?</label>
+            <textarea class="form-control" id="resolution_attempt" name="resolution_attempt" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="people_involved" class="form-label">Other People Involved (type names, separated by commas)</label>
+            <input type="text" class="form-control" id="people_involved" name="people_involved" placeholder="First Last, First Last, ...">
+        </div>
+        <button type="submit" class="btn btn-success">Submit Complaint</button>
+        <a href="{{ url_for('arbitration.index') }}" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+{% endblock %} 

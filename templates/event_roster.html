@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Event Roster: {{ event.title }}</h2>
         {% if current_user.can_create_events %}
-        <a href="{{ url_for('event_roster_pdf', event_id=event.id) }}" class="btn btn-danger" target="_blank">
+        <a href="{{ url_for('events.event_roster_pdf', event_id=event.id) }}" class="btn btn-danger" target="_blank">
             <i class="fas fa-file-pdf"></i> Print PDF
         </a>
         {% endif %}
@@ -26,7 +26,7 @@
                         <tbody>
                         {% for group in participant_groups %}
                         <tr>
-                            <td>{{ group.user.username }} ({{ group.user.email }})</td>
+                            <td>{{ group.user.first_name }} {{ group.user.last_name }}</td>
                             <td>{{ group.character.name }} ({{ group.character.realm }})</td>
                             <td>{{ group.timeblocks|join(', ') }}</td>
                         </tr>
@@ -49,7 +49,7 @@
                         <tbody>
                         {% for group in cast_groups %}
                         <tr>
-                            <td>{{ group.user.username }} ({{ group.user.email }})</td>
+                            <td>{{ group.user.first_name }} {{ group.user.last_name }}</td>
                             <td>{{ group.character.name }} ({{ group.character.realm }})</td>
                             <td>{{ group.timeblocks|join(', ') }}</td>
                             <td>{{ group.statuses|join(', ') }}</td>
@@ -64,6 +64,6 @@
             </div>
         </div>
     </div>
-    <a href="{{ url_for('events') }}" class="btn btn-secondary">Back to Events</a>
+    <a href="{{ url_for('events.events') }}" class="btn btn-secondary">Back to Events</a>
 </div>
 {% endblock %} 
