@@ -1,6 +1,6 @@
 # Mystic Realms Character Database
 
-A web application for managing characters in the Mystic Realms universe.
+A web application for managing users characters in the Mystic Realms universe.
 
 ## Features
 
@@ -10,6 +10,10 @@ A web application for managing characters in the Mystic Realms universe.
 - Skill management with categories and subcategories
 - Realm-specific species selection
 - Health and stamina management
+- Arbitration Management
+- Print Screen
+- Automatic email updates (not implemented)
+
 
 ## Setup
 
@@ -21,15 +25,8 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 2. Install dependencies:
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt  # Out of date
 ```
-
-3. Create a `skills.xlsx` file in the root directory with the following columns:
-   - Lore Category
-   - Sub Category
-   - Skill Name
-   - Cost
-   - Rank (optional)
 
 4. Run the application:
 ```bash
@@ -40,19 +37,4 @@ python app.py
 
 ## Database Structure
 
-The application uses SQLite as its database. The database will be automatically created when you first run the application.
-
-### Models
-
-- User: Stores user account information
-- Character: Stores character information
-- Skill: Stores skill information
-- CharacterSkill: Links characters to their skills
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request 
+The application uses Postsgres as its database. The database will be automatically created when you first run the application.
